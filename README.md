@@ -117,4 +117,25 @@ kafka-console-producer --broker-list localhost:9092 --topic new_topic
 sed -i 's/num.partitions=1/num.partitions=3/g' $KafkaPath/config/server.properties
 ```
 
+### Kafka Consumer
+- See `kafka-console-consumer.sh` for further details.
+```shell
+# Kafka Consumer
+# A consumer is the receiver of messages. A consumer .. get it? I'll stop now. 
+
+KafkaPort=9092
+
+# Start a consumer and read topic "first_topic"
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic
+
+# Why is this empty even though I produced a few messages moments ago?
+# TLDR Kafka is real time
+
+# Get all the messages from a topic
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --from-beginning
+```
+
+#### Demo of a Single Consumer and Producer
+![Alt Text](./media/consumer-producer-demo.gif)
+
 #### Credits to Stephane. Check out his awesome course on [Udemy](https://www.udemy.com/course/apache-kafka/)
