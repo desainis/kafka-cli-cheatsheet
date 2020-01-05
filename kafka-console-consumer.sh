@@ -11,3 +11,6 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic
 
 # Get all the messages from a topic
 kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --from-beginning
+
+# Consumer with Keys
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --from-beginning --property print.key=true --property key.separator=,

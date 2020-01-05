@@ -31,5 +31,10 @@ kafka-console-producer --broker-list localhost:9092 --topic new_topic
 #Topic:new_topic PartitionCount:1     ReplicationFactor:1      Configs:
 #        Topic: new_topic        Partition: 0  Leader: 0       Replicas: 0  Isr: 0
 
+# Producer with Keys
+kafka-console-producer --broker-list localhost:9092 --topic first_topic --property parse.key=true --property key.separator=,
+#> key,value
+#> another key,another value
+
 # Change the defaults in $KafkaPath/config/server.properties num.partitions=<num>
 sed -i 's/num.partitions=1/num.partitions=3/g' $KafkaPath/config/server.properties
