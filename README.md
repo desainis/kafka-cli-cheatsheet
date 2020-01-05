@@ -113,6 +113,11 @@ kafka-console-producer --broker-list localhost:9092 --topic new_topic
 #Topic:new_topic PartitionCount:1     ReplicationFactor:1      Configs:
 #        Topic: new_topic        Partition: 0  Leader: 0       Replicas: 0  Isr: 0
 
+# Producer with Keys
+kafka-console-producer --broker-list localhost:9092 --topic first_topic --property parse.key=true --property key.separator=,
+#> key,value
+#> another key,another value
+
 # Change the defaults in $KafkaPath/config/server.properties num.partitions=<num>
 sed -i 's/num.partitions=1/num.partitions=3/g' $KafkaPath/config/server.properties
 ```
@@ -133,10 +138,13 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic
 
 # Get all the messages from a topic
 kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --from-beginning
+
+# Consumer with Keys
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --from-beginning --property print.key=true --property key.separator=,
 ```
 
 #### Demo of a Single Consumer and Producer
-![Alt Text](./media/consumer-producer-demo.gif)
+![Single Consumer and Producer Demo](./media/consumer-producer-demo.gif)
 
 ### Kafka Consumers in a Group
 - See `kafka-console-consumer-with-groups.sh` for further details
@@ -173,6 +181,56 @@ kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group my-fi
 # CURRENT-OFFSET: how many messages have I read so far?
 # LOG-END-OFFSET: How many more messages exist?
 # LAG: LOG-END-OFFSET - CURRENT-OFFSET (i.e. how many messages do I still have to read)
+```
+
+#### Demo of using consumer groups
+![Consumer Group Demo with Same Group](./media/consumer-group-demo-same-group.gif)
+
+### Resetting Offsets
+- See `resetting-offsets.sh` for further details
+```shell
+# Resetting Offsets
+# Why? Because you may want to replay messages
+
+# Reminder
+KafkaPort=9092
+
+# Use --reset-offsets to replay messages
+# This is a dry run and will error out. 
+kafka-consumer-groups --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --to-earliest
+
+# Provide the execute option
+kafka-consumer-groups --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --to-earliest --execute
+
+# Oops we messed up again. 
+# We forgot the topic. Doh!
+# Use --all-topics carefully ...
+# --to-earliest - reset from beginning
+# --shift-by - shift the offset by a number (positive or negatve depending on direction)
+kafka-consumer-groups --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --to-earliest --topic first_topic
+
+# --reset-offsets                         Reset offsets of consumer group.       
+#                                           Supports one consumer group at the   
+#                                           time, and instances should be        
+#                                           inactive                             
+#                                         Has 2 execution options: --dry-run     
+#                                           (the default) to plan which offsets  
+#                                           to reset, and --execute to update    
+#                                           the offsets. Additionally, the --    
+#                                           export option is used to export the  
+#                                           results to a CSV format.             
+#                                         You must choose one of the following   
+#                                           reset specifications: --to-datetime, 
+#                                           --by-period, --to-earliest, --to-    
+#                                           latest, --shift-by, --from-file, --  
+#                                           to-current.                          
+#                                         To define the scope use --all-topics   
+#                                           or --topic. One scope must be        
+#                                           specified unless you use '--from-    
+#                                           file'.
+
+# Replay the reset consumer group and watch all the messages replay. Woohoo!
+kafka-console-consumer --bootstrap-server localhost:$KafkaPort --topic first_topic --group my-first-application
 ```
 
 #### Credits to Stephane. Check out his awesome course on [Udemy](https://www.udemy.com/course/apache-kafka/)
